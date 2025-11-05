@@ -2,6 +2,7 @@ mod ai_translator;
 mod command_detector;
 mod command_executor;
 mod error_analyzer;
+mod file_locator;
 mod safety;
 mod system_monitor;
 
@@ -24,6 +25,7 @@ struct ExecutionResponse {
     current_dir: String,
     error_analysis: Option<error_analyzer::ErrorAnalysis>,
     suggested_fix: Option<String>,
+    safety_check: Option<safety::SafetyCheck>,
 }
 
 #[tauri::command]
@@ -165,8 +167,28 @@ async fn execute_input<R: tauri::Runtime>(
         input.clone()
     };
 
+    // Enhance command with full file paths if needed
+    let command_to_execute = file_locator::enhance_command_with_paths(&command_to_execute)
+        .map_err(|e| e.to_string())?;
+
     // Check safety
     let safety_check = check_safety(command_to_execute.clone());
+
+    // If command needs confirmation and force_execute is false, return early with confirmation request
+    if safety_check.danger_level != safety::DangerLevel::Safe && !force_execute {
+        return Ok(ExecutionResponse {
+            output: String::new(),
+            error: None,
+            exit_code: 0,
+            command_run: command_to_execute,
+            needs_confirmation: true,
+            was_natural_language: is_natural_language,
+            current_dir: get_current_directory().unwrap_or_else(|_| ".".to_string()),
+            error_analysis: None,
+            suggested_fix: None,
+            safety_check: Some(safety_check),
+        });
+    }
 
     // Execute the command
     let (result, pid) = command_executor::execute_shell_command_streaming(&command_to_execute, &app_handle)
@@ -210,11 +232,16 @@ async fn execute_input<R: tauri::Runtime>(
         },
         exit_code: result.exit_code,
         command_run: command_to_execute,
-        needs_confirmation: safety_check.danger_level != safety::DangerLevel::Safe,
+        needs_confirmation: false, // Command already executed if we reach this point
         was_natural_language: is_natural_language,
         current_dir,
         error_analysis,
         suggested_fix,
+        safety_check: if safety_check.danger_level != safety::DangerLevel::Safe {
+            Some(safety_check)
+        } else {
+            None
+        },
     })
 }
 
