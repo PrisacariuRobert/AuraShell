@@ -47,12 +47,6 @@ interface Session {
   currentDirectory: string;
 }
 
-interface SafetyCheck {
-  is_safe: boolean;
-  warning: string | null;
-  danger_level: "Safe" | "Low" | "Medium" | "High" | "Critical";
-}
-
 interface ExecutionResponse {
   output: string;
   error: string | null;
@@ -63,7 +57,6 @@ interface ExecutionResponse {
   current_dir: string;
   error_analysis: ErrorAnalysis | null;
   suggested_fix: string | null;
-  safety_check: SafetyCheck | null;
 }
 
 interface SystemStats {
@@ -108,10 +101,9 @@ function App() {
     disk_write: 0,
     uptime: 0,
   });
-  const [pendingDangerousCommand, setPendingDangerousCommand] = useState<{
+  const [pendingDangerousCommand, setPendingDangerousCommand] = useState<{ 
     command: string;
     messageId: string;
-    safetyCheck: SafetyCheck | null;
   } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -466,7 +458,7 @@ function App() {
         // Only show error message if exit code indicates failure
         if (result.error && result.exit_code !== 0) {
           // Check if this is a "Command Not Found" error for a recently installed package
-          const isCommandNotFound = result.errorAnalysis?.error_type === "Command Not Found" ||
+          const isCommandNotFound = result.error_analysis?.error_type === "Command Not Found" ||
                                      result.error.includes("command not found") ||
                                      result.error.includes("not recognized");
 
@@ -572,18 +564,11 @@ function App() {
         setPendingDangerousCommand({
           command: result.command_run,
           messageId: msgId,
-          safetyCheck: result.safety_check,
         });
-
-        // Create detailed warning message based on safety check
-        let warningMessage = "This command could cause data loss or system damage.";
-        if (result.safety_check?.warning) {
-          warningMessage = result.safety_check.warning;
-        }
 
         addMessage({
           type: "ai",
-          content: warningMessage,
+          content: `This command could cause data loss or system damage.`, 
           command: result.command_run,
           needsConfirmation: true,
         });
@@ -691,7 +676,7 @@ function App() {
           }
         } else if (result.error && result.exit_code !== 0) {
           // Check if this is a "Command Not Found" error for a recently installed package
-          const isCommandNotFound = result.errorAnalysis?.error_type === "Command Not Found" ||
+          const isCommandNotFound = result.error_analysis?.error_type === "Command Not Found" ||
                                      result.error.includes("command not found") ||
                                      result.error.includes("not recognized");
 
@@ -1165,29 +1150,6 @@ function App() {
                           <div>
                             <h3 className="warning-title">
                               Confirmation Required
-                              {pendingDangerousCommand?.safetyCheck && (
-                                <span
-                                  className={`danger-badge danger-${pendingDangerousCommand.safetyCheck.danger_level.toLowerCase()}`}
-                                  style={{
-                                    marginLeft: "0.5rem",
-                                    padding: "0.125rem 0.5rem",
-                                    borderRadius: "0.25rem",
-                                    fontSize: "0.75rem",
-                                    fontWeight: "600",
-                                    backgroundColor:
-                                      pendingDangerousCommand.safetyCheck.danger_level === "Critical"
-                                        ? "#7f1d1d"
-                                        : pendingDangerousCommand.safetyCheck.danger_level === "High"
-                                        ? "#991b1b"
-                                        : pendingDangerousCommand.safetyCheck.danger_level === "Medium"
-                                        ? "#b45309"
-                                        : "#854d0e",
-                                    color: "#fff",
-                                  }}
-                                >
-                                  {pendingDangerousCommand.safetyCheck.danger_level.toUpperCase()}
-                                </span>
-                              )}
                             </h3>
                             <p className="warning-text">{message.content}</p>
                           </div>
@@ -1203,10 +1165,10 @@ function App() {
                             className="warning"
                             onClick={handleConfirmDangerous}
                           >
-                            ✓ Confirm Execution
+                            ✓ Confirm
                           </button>
                           <button onClick={handleCancelDangerous}>
-                            ✕ Cancel
+                            Cancel
                           </button>
                         </div>
                       </div>
@@ -1454,7 +1416,10 @@ function App() {
               <div className="monitor-section">
                 <p className="section-label">Session Status</p>
                 <div className="info-card">
-                  
+                  <div className="info-row">
+                    <span className="info-label">Uptime</span>
+                    <span className="info-value">{formatUptime(systemStats.uptime)}</span>
+                  </div>
                   <div className="info-row">
                     <span className="info-label">Commands Run</span>
                     <span className="info-value">

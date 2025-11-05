@@ -20,6 +20,7 @@ pub struct ExecutionResult {
 pub async fn execute_shell_command_streaming<R: tauri::Runtime>(
     command: &str,
     app_handle: &tauri::AppHandle<R>,
+    directory: Option<&str>,
 ) -> Result<(ExecutionResult, Option<u32>), Box<dyn Error + Send + Sync>> {
     let pty_system = NativePtySystem::default();
 
@@ -32,26 +33,18 @@ pub async fn execute_shell_command_streaming<R: tauri::Runtime>(
         })
         .map_err(|e| format!("Failed to open PTY: {}", e))?;
 
-    #[cfg(target_os = "windows")]
-    let shell_command = {
-        let mut cmd = CommandBuilder::new("cmd.exe");
-        cmd.arg("/C");
-        cmd.arg(command);
-        cmd
-    };
-
-    #[cfg(not(target_os = "windows"))]
-    let shell_command = {
-        let mut cmd = CommandBuilder::new("sh");
-        cmd.arg("-c");
-        cmd.arg(command);
-        cmd
-    };
+    let mut shell_command = CommandBuilder::new("sh");
+    shell_command.arg("-c");
+    shell_command.arg(command);
+    if let Some(dir) = directory {
+        shell_command.cwd(dir);
+    }
 
     let mut child = pty_pair
         .slave
         .spawn_command(shell_command)
         .map_err(|e| format!("Failed to spawn command: {}", e))?;
+
 
     let pid = child.process_id();
 

@@ -55,7 +55,12 @@ async fn execute_command_with_confirmation<R: tauri::Runtime>(
     state: State<'_, Mutex<AppState>>,
 ) -> Result<String, String> {
     // Execute the command with streaming
-    let (result, pid) = command_executor::execute_shell_command_streaming(&command, &app_handle)
+    let current_dir = std::env::current_dir().unwrap();
+    let (result, pid) = command_executor::execute_shell_command_streaming(
+        &command, 
+        &app_handle,
+        current_dir.to_str(),
+    )
         .await
         .map_err(|e| format!("Execution error: {}", e))?;
 
@@ -190,8 +195,54 @@ async fn execute_input<R: tauri::Runtime>(
         });
     }
 
+    // Handle 'cd' command separately
+    if command_to_execute.starts_with("cd ") {
+        let path = command_to_execute.split_whitespace().nth(1).unwrap_or("~");
+        let home_dir = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+        
+        let target_path = if path == "~" {
+            home_dir
+        } else if path.starts_with("~/") {
+            format!("{}/{}", home_dir, &path[2..])
+        } else {
+            path.to_string()
+        };
+
+        return match std::env::set_current_dir(&target_path) {
+            Ok(_) => Ok(ExecutionResponse {
+                output: String::new(),
+                error: None,
+                exit_code: 0,
+                command_run: command_to_execute,
+                needs_confirmation: false,
+                was_natural_language: is_natural_language,
+                current_dir: get_current_directory().unwrap_or_else(|_| ".".to_string()),
+                error_analysis: None,
+                suggested_fix: None,
+                safety_check: None,
+            }),
+            Err(e) => Ok(ExecutionResponse {
+                output: String::new(),
+                error: Some(format!("Failed to change directory: {}", e)),
+                exit_code: 1,
+                command_run: command_to_execute,
+                needs_confirmation: false,
+                was_natural_language: is_natural_language,
+                current_dir: get_current_directory().unwrap_or_else(|_| ".".to_string()),
+                error_analysis: None,
+                suggested_fix: None,
+                safety_check: None,
+            }),
+        };
+    }
+
     // Execute the command
-    let (result, pid) = command_executor::execute_shell_command_streaming(&command_to_execute, &app_handle)
+    let current_dir_path = std::env::current_dir().unwrap();
+    let (result, pid) = command_executor::execute_shell_command_streaming(
+        &command_to_execute, 
+        &app_handle,
+        current_dir_path.to_str(),
+    )
         .await
         .map_err(|e| format!("Execution error: {}", e))?;
 
