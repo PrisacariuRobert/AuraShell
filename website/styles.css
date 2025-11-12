@@ -691,7 +691,7 @@ body {
 .showcase-stack-container {
     position: relative;
     margin-top: 64px;
-    min-height: 800vh;
+    min-height: 300vh;
 }
 
 .showcase-sticky-wrapper {

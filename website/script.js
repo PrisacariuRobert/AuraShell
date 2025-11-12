@@ -1338,7 +1338,7 @@ function initShowcaseStackedCards() {
         // Add delay effect using easing function
         // This creates a pause at each card position (0, 0.25, 0.5, 0.75, 1.0)
         function easeInOutWithDelay(x) {
-            const delayAmount = 0.1; // 30% pause, 70% transition for easy scrolling
+            const delayAmount = 0.25; // 25% pause, 75% transition for smooth scrolling
             const transitionAmount = 1 - delayAmount;
 
             // Map progress to include delays
