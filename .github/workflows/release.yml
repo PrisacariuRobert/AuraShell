@@ -109,6 +109,13 @@ jobs:
             src-tauri/target/release/bundle/
           retention-days: 30
 
+      - name: Find and upload Windows artifacts
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          Write-Host "Listing target directories..."
+          Get-ChildItem -Path src-tauri\target\release\bundle -Recurse | Format-Table Name, FullName
+
       - name: Upload Windows artifacts
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
