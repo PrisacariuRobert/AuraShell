@@ -1,6 +1,7 @@
 use regex::Regex;
 use lazy_static::lazy_static;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
+use std::error::Error;
 
 #[derive(Debug, Serialize)]
 pub struct ErrorAnalysis {
@@ -138,6 +139,136 @@ pub fn analyze_error(error_output: &str) -> Option<ErrorAnalysis> {
     }
 
     None
+}
+
+#[derive(Serialize, Debug)]
+struct GeminiRequest {
+    contents: Vec<Content>,
+    tools: Option<Vec<Tool>>,
+}
+
+#[derive(Serialize, Debug)]
+struct Tool {
+    #[serde(rename = "googleSearch")]
+    google_search: GoogleSearch,
+}
+
+#[derive(Serialize, Debug)]
+struct GoogleSearch {}
+
+#[derive(Serialize, Debug)]
+struct Content {
+    parts: Vec<Part>,
+}
+
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
+enum Part {
+    Text { text: String },
+}
+
+#[derive(Deserialize, Debug)]
+struct GeminiResponse {
+    candidates: Vec<Candidate>,
+}
+
+#[derive(Deserialize, Debug)]
+struct Candidate {
+    content: ContentResponse,
+}
+
+#[derive(Deserialize, Debug)]
+struct ContentResponse {
+    parts: Vec<PartResponse>,
+}
+
+#[derive(Deserialize, Debug)]
+struct PartResponse {
+    text: String,
+}
+
+/// Use AI with Google Search to generate a fix for an unknown error
+pub async fn generate_ai_fix(
+    error_output: &str,
+    failed_command: &str,
+) -> Result<ErrorAnalysis, Box<dyn Error + Send + Sync>> {
+    dotenvy::dotenv().ok();
+
+    let api_key = std::env::var("GEMINI_API_KEY")
+        .unwrap_or_else(|_| "AIzaSyCnVi34Wd_fKoqW2m3TqJ9sSGVVdK_7F6w".to_string());
+
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={}",
+        api_key
+    );
+
+    let prompt = format!(
+        "I ran this command: `{}`\n\n\
+        And got this error:\n```\n{}\n```\n\n\
+        Please analyze this error and provide:\n\
+        1. A brief error type (2-4 words)\n\
+        2. A one-sentence explanation of what went wrong\n\
+        3. The exact command to fix it (just the command, no explanation)\n\n\
+        Format your response EXACTLY as:\n\
+        ERROR_TYPE: <type>\n\
+        EXPLANATION: <explanation>\n\
+        FIX_COMMAND: <command>",
+        failed_command, error_output
+    );
+
+    let client = reqwest::Client::new();
+    let gemini_request = GeminiRequest {
+        contents: vec![Content {
+            parts: vec![Part::Text { text: prompt }],
+        }],
+        tools: Some(vec![Tool {
+            google_search: GoogleSearch {},
+        }]),
+    };
+
+    let res = client
+        .post(&url)
+        .json(&gemini_request)
+        .send()
+        .await?;
+
+    if res.status().is_success() {
+        let gemini_response = res.json::<GeminiResponse>().await?;
+        if let Some(candidate) = gemini_response.candidates.get(0) {
+            if let Some(part) = candidate.content.parts.get(0) {
+                let response_text = part.text.trim();
+
+                // Parse the response
+                let error_type = response_text
+                    .lines()
+                    .find(|line| line.starts_with("ERROR_TYPE:"))
+                    .and_then(|line| line.strip_prefix("ERROR_TYPE:"))
+                    .map(|s| s.trim().to_string())
+                    .unwrap_or_else(|| "Error".to_string());
+
+                let explanation = response_text
+                    .lines()
+                    .find(|line| line.starts_with("EXPLANATION:"))
+                    .and_then(|line| line.strip_prefix("EXPLANATION:"))
+                    .map(|s| s.trim().to_string())
+                    .unwrap_or_else(|| "An error occurred.".to_string());
+
+                let fix_command = response_text
+                    .lines()
+                    .find(|line| line.starts_with("FIX_COMMAND:"))
+                    .and_then(|line| line.strip_prefix("FIX_COMMAND:"))
+                    .map(|s| s.trim().to_string());
+
+                return Ok(ErrorAnalysis {
+                    error_type,
+                    suggestion: explanation,
+                    auto_fix_command: fix_command,
+                });
+            }
+        }
+    }
+
+    Err("Failed to generate AI fix".into())
 }
 
 #[cfg(test)]

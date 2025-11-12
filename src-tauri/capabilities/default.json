@@ -4,6 +4,9 @@
   "description": "Default permissions for the application",
   "windows": [ "main" ],
   "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "core:event:allow-unlisten",
     "dialog:default",
     "fs:default"
   ]

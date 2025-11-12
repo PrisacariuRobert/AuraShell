@@ -3,15 +3,22 @@ mod command_detector;
 mod command_executor;
 mod error_analyzer;
 mod file_locator;
+mod os_info;
 mod safety;
 mod system_monitor;
 
 use serde::Serialize;
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{Emitter, State};
 
 struct AppState {
     pid: Option<u32>,
+}
+
+#[derive(Clone, Serialize)]
+struct ProgressUpdate {
+    message: String,
+    stage: String,
 }
 
 #[derive(Serialize)]
@@ -26,26 +33,32 @@ struct ExecutionResponse {
     error_analysis: Option<error_analyzer::ErrorAnalysis>,
     suggested_fix: Option<String>,
     safety_check: Option<safety::SafetyCheck>,
+    grounding_metadata: Option<ai_translator::GroundingMetadata>,
 }
 
 #[tauri::command]
 async fn translate_command(
     user_input: String,
     conversation_history: Option<String>,
-) -> Result<String, String> {
+) -> Result<ai_translator::TranslationResult, String> {
+    // Detect OS information
+    let os_info = os_info::OsInfo::detect();
+    let os_context = os_info.format_for_prompt();
+
     // Use smart intent classifier to determine if web search is needed
     let use_web_search = ai_translator::should_use_web_search_for_input(&user_input);
 
     // Translate only once with the appropriate settings
-    let command = ai_translator::translate_to_shell_command(
+    let result = ai_translator::translate_to_shell_command(
         &user_input,
         use_web_search,
         conversation_history.as_deref(),
+        Some(&os_context),
     )
     .await
     .map_err(|e| e.to_string())?;
 
-    Ok(command)
+    Ok(result)
 }
 
 #[tauri::command]
@@ -160,17 +173,60 @@ async fn execute_input<R: tauri::Runtime>(
     state: State<'_, Mutex<AppState>>,
 ) -> Result<ExecutionResponse, String> {
     // Determine if input is a direct command or natural language
+    // Extract word count and first word for pattern matching
+    let word_count = input.split_whitespace().count();
+    let first_word = input
+        .split_whitespace()
+        .next()
+        .map(|w| w.to_lowercase())
+        .unwrap_or_default();
+
+    // Common action verbs that indicate natural language commands
+    const ACTION_VERBS: &[&str] = &[
+        "install", "download", "update", "upgrade", "remove", "uninstall",
+        "list", "show", "find", "search", "create", "delete", "start",
+        "stop", "run", "get", "set", "add", "configure", "setup"
+    ];
+
+    // Detect if input is natural language
     let is_natural_language = !input.trim_start().starts_with('/')
         && !input.trim_start().starts_with('.')
         && !input.contains('=')
-        && input.split_whitespace().count() > 2;
+        && (
+            word_count > 2 ||
+            (word_count == 2 && ACTION_VERBS.contains(&first_word.as_str()))
+        );
 
-    let command_to_execute = if is_natural_language && !force_execute {
+    let (command_to_execute, grounding_metadata) = if is_natural_language && !force_execute {
+        // Check if web search will be used
+        let use_web_search = ai_translator::should_use_web_search_for_input(&input);
+
+        // Emit initial progress event
+        let _ = app_handle.emit("progress-update", ProgressUpdate {
+            message: "Translating natural language to command...".to_string(),
+            stage: "translate".to_string(),
+        });
+
+        // Emit web search progress if applicable
+        if use_web_search {
+            let _ = app_handle.emit("progress-update", ProgressUpdate {
+                message: "Searching web for installation instructions...".to_string(),
+                stage: "web-search".to_string(),
+            });
+        }
+
         // Translate natural language to shell command with conversation context
-        translate_command(input.clone(), conversation_history).await?
+        let translation_result = translate_command(input.clone(), conversation_history).await?;
+        (translation_result.command, translation_result.grounding_metadata)
     } else {
-        input.clone()
+        (input.clone(), None)
     };
+
+    // Emit progress event for path resolution
+    let _ = app_handle.emit("progress-update", ProgressUpdate {
+        message: "Resolving file paths...".to_string(),
+        stage: "resolve-paths".to_string(),
+    });
 
     // Enhance command with full file paths if needed
     let command_to_execute = file_locator::enhance_command_with_paths(&command_to_execute)
@@ -192,6 +248,7 @@ async fn execute_input<R: tauri::Runtime>(
             error_analysis: None,
             suggested_fix: None,
             safety_check: Some(safety_check),
+            grounding_metadata: grounding_metadata.clone(),
         });
     }
 
@@ -220,6 +277,7 @@ async fn execute_input<R: tauri::Runtime>(
                 error_analysis: None,
                 suggested_fix: None,
                 safety_check: None,
+                grounding_metadata: grounding_metadata.clone(),
             }),
             Err(e) => Ok(ExecutionResponse {
                 output: String::new(),
@@ -232,6 +290,7 @@ async fn execute_input<R: tauri::Runtime>(
                 error_analysis: None,
                 suggested_fix: None,
                 safety_check: None,
+                grounding_metadata: grounding_metadata.clone(),
             }),
         };
     }
@@ -262,7 +321,23 @@ async fn execute_input<R: tauri::Runtime>(
             &result.stdout
         };
 
-        let analysis = error_analyzer::analyze_error(error_output);
+        // First try pattern-based analysis
+        let mut analysis = error_analyzer::analyze_error(error_output);
+
+        // If no pattern matched or it's an unknown error, use AI to generate a fix
+        if analysis.is_none() || (analysis.as_ref().map(|a| a.error_type.as_str()) == Some("Unknown Error")) {
+            // Emit progress event
+            let _ = app_handle.emit("progress-update", ProgressUpdate {
+                message: "Analyzing error with AI...".to_string(),
+                stage: "analyze-error".to_string(),
+            });
+
+            // Try AI-powered fix generation with web search
+            if let Ok(ai_analysis) = error_analyzer::generate_ai_fix(error_output, &command_to_execute).await {
+                analysis = Some(ai_analysis);
+            }
+        }
+
         let fix = analysis.as_ref().and_then(|a| a.auto_fix_command.clone());
         (analysis, fix)
     } else {
@@ -293,7 +368,13 @@ async fn execute_input<R: tauri::Runtime>(
         } else {
             None
         },
+        grounding_metadata,
     })
+}
+
+#[tauri::command]
+fn get_os_info() -> os_info::OsInfo {
+    os_info::OsInfo::detect()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -323,6 +404,7 @@ pub fn run() {
             analyze_error,
             get_current_directory,
             set_home_directory,
+            get_os_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
