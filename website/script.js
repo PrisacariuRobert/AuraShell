@@ -1,4 +1,21 @@
 // ============================================
+// Mobile Navigation Toggle
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+
+    if (navToggle && mobileNav) {
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        });
+    }
+});
+
+
+// ============================================
 // Typing Animation for Terminal Demo
 // ============================================
 
