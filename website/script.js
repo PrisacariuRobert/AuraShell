@@ -1512,7 +1512,7 @@ function setupDownloadButtons() {
             buttonText = 'Download for macOS (Intel)';
         }
     } else if (detected.os === 'linux') {
-        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/latest/download/aura-shell_0.1.0_amd64.AppImage';
+        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/latest/download/aura-shell_0.1.0_amd64.deb';
         buttonText = 'Download for Linux';
     } else if (detected.os === 'windows') {
         // Windows not supported yet, default to macOS
