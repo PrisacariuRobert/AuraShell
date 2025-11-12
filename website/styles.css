@@ -2010,7 +2010,9 @@ body {
     padding: 0;
     width: 24px;
     height: 24px;
-    position: relative;
+    position: fixed;
+    top: 18px;
+    right: 16px;
     z-index: 9999; /* Increased z-index */
 }
 
