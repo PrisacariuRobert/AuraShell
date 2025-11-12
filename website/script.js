@@ -186,12 +186,14 @@ window.addEventListener('scroll', () => {
 // ============================================
 
 window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
+    if (window.matchMedia('(min-width: 769px)').matches) {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero');
 
-    if (hero && scrolled < window.innerHeight) {
-        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-        hero.style.opacity = 1 - (scrolled / 800);
+        if (hero && scrolled < window.innerHeight) {
+            hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            hero.style.opacity = 1 - (scrolled / 800);
+        }
     }
 });
 
