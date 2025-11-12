@@ -318,9 +318,14 @@
 
             <!-- All Download Options -->
             <div class="download-options">
-                <h3 style="margin-bottom: 1.5rem; color: #888; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">All Platforms</h3>
+                <button class="download-toggle-btn" id="download-toggle-btn">
+                    <span>All Platforms</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toggle-icon">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                </button>
 
-                <div class="download-grid">
+                <div class="download-grid" id="download-grid">
                     <!-- macOS Apple Silicon -->
                     <div class="download-card">
                         <div class="download-card-icon">

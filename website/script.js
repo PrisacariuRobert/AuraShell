@@ -1538,3 +1538,19 @@ function setupDownloadButtons() {
 
 // Initialize download buttons on page load
 document.addEventListener('DOMContentLoaded', setupDownloadButtons);
+
+// ============================================
+// Download Options Toggle
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('download-toggle-btn');
+    const downloadGrid = document.getElementById('download-grid');
+
+    if (toggleBtn && downloadGrid) {
+        toggleBtn.addEventListener('click', () => {
+            toggleBtn.classList.toggle('active');
+            downloadGrid.classList.toggle('expanded');
+        });
+    }
+});
