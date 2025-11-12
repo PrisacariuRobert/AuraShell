@@ -66,15 +66,43 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
-      - name: List output directory
+      - name: Find and upload macOS artifacts
         if: matrix.platform == 'macos-latest'
         run: |
-          ls -R src-tauri/target/release
+          echo "Listing target directories..."
+          ls -la src-tauri/target/
+          if [ -d "src-tauri/target/aarch64-apple-darwin/release/bundle" ]; then
+            echo "Found aarch64 bundle"
+            ls -R src-tauri/target/aarch64-apple-darwin/release/bundle/
+          fi
+          if [ -d "src-tauri/target/x86_64-apple-darwin/release/bundle" ]; then
+            echo "Found x86_64 bundle"
+            ls -R src-tauri/target/x86_64-apple-darwin/release/bundle/
+          fi
 
-      - name: Upload artifacts
+      - name: Upload macOS aarch64 artifacts
+        if: matrix.platform == 'macos-latest' && matrix.args == '--target aarch64-apple-darwin'
         uses: actions/upload-artifact@v4
         with:
-          name: aurashell-${{ matrix.platform }}-${{ matrix.args != '' && matrix.args || 'default' }}
+          name: aurashell-macos-aarch64
+          path: |
+            src-tauri/target/aarch64-apple-darwin/release/bundle/
+          retention-days: 30
+
+      - name: Upload macOS x86_64 artifacts
+        if: matrix.platform == 'macos-latest' && matrix.args == '--target x86_64-apple-darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurashell-macos-x64
+          path: |
+            src-tauri/target/x86_64-apple-darwin/release/bundle/
+          retention-days: 30
+
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurashell-linux-x64
           path: |
             src-tauri/target/release/bundle/
           retention-days: 30
