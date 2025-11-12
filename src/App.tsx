@@ -27,7 +27,7 @@ interface SearchResult {
 
 interface ChatMessage {
   id: string;
-  type: "ai" | "user" | "search";
+  type: "ai" | "user" | "search" | "system";
   content: string;
   timestamp: Date;
   command?: string;
@@ -37,6 +37,8 @@ interface ChatMessage {
   errorAnalysis?: ErrorAnalysis;
   suggestedFix?: string;
   searchResult?: SearchResult;
+  groundingMetadata?: GroundingMetadata;
+  path?: string;
 }
 
 interface Session {
@@ -45,6 +47,28 @@ interface Session {
   messages: ChatMessage[];
   commandHistory: string[];
   currentDirectory: string;
+}
+
+interface GroundingMetadata {
+  webSearchQueries?: string[];
+  groundingChunks?: GroundingChunk[];
+  groundingSupports?: GroundingSupport[];
+}
+
+interface GroundingChunk {
+  web?: {
+    uri: string;
+    title?: string;
+  };
+}
+
+interface GroundingSupport {
+  segment?: {
+    startIndex: number;
+    endIndex: number;
+    text: string;
+  };
+  groundingChunkIndices?: number[];
 }
 
 interface ExecutionResponse {
@@ -57,6 +81,7 @@ interface ExecutionResponse {
   current_dir: string;
   error_analysis: ErrorAnalysis | null;
   suggested_fix: string | null;
+  grounding_metadata?: GroundingMetadata;
 }
 
 interface SystemStats {
@@ -67,6 +92,13 @@ interface SystemStats {
   disk_read: number;
   disk_write: number;
   uptime: number;
+}
+
+interface OsInfo {
+  os_type: string;
+  os_name: string;
+  package_manager: string;
+  shell: string;
 }
 
 function App() {
@@ -118,6 +150,8 @@ function App() {
   const [executionPanelCollapsed, setExecutionPanelCollapsed] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [recentlyInstalledPackages, setRecentlyInstalledPackages] = useState<Array<{name: string, timestamp: number}>>([]);
+  const [progressMessage, setProgressMessage] = useState<string | null>(null);
+  const [osInfo, setOsInfo] = useState<OsInfo | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -140,6 +174,19 @@ function App() {
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Fetch OS info on mount
+  useEffect(() => {
+    const fetchOsInfo = async () => {
+      try {
+        const info = await invoke<OsInfo>("get_os_info");
+        setOsInfo(info);
+      } catch (error) {
+        console.error("Failed to get OS info:", error);
+      }
+    };
+    fetchOsInfo();
   }, []);
 
   // Load theme from localStorage on mount
@@ -183,7 +230,7 @@ function App() {
     loadCurrentDir();
   }, []);
 
-  // Listen for streaming command output
+  // Listen for streaming command output and progress updates
   useEffect(() => {
     const setupListeners = async () => {
       // Listen for stdout
@@ -196,9 +243,15 @@ function App() {
         setStreamingOutput((prev) => prev + event.payload + "\n");
       });
 
+      // Listen for progress updates
+      const unlistenProgress = await listen<{message: string, stage: string}>("progress-update", (event) => {
+        setProgressMessage(event.payload.message);
+      });
+
       return () => {
         unlistenOutput();
         unlistenError();
+        unlistenProgress();
       };
     };
 
@@ -444,6 +497,7 @@ function App() {
           error: result.error || undefined,
           errorAnalysis: result.error_analysis || undefined,
           suggestedFix: result.suggested_fix || undefined,
+          groundingMetadata: result.grounding_metadata || undefined,
         });
 
         // Track successful installations
@@ -483,7 +537,7 @@ function App() {
               try {
                 const searchResult = await withTimeout(
                   invoke<SearchResult>("search_information", {
-                    query: `how to run ${recentlyInstalled.name} after installing on macOS`,
+                    query: `how to run ${recentlyInstalled.name} after installing on ${osInfo?.os_name || "your system"}`,
                   }),
                   30000,
                   "Search request timed out."
@@ -528,6 +582,7 @@ function App() {
         setIsExecuting(false);
         setExecutingCommand(null);
         setStreamingMessageId(null);
+        setProgressMessage(null);
         setStreamingOutput("");
         inputRef.current?.focus();
       }
@@ -587,6 +642,7 @@ function App() {
           error: result.error || undefined,
           errorAnalysis: result.error_analysis || undefined,
           suggestedFix: result.suggested_fix || undefined,
+          groundingMetadata: result.grounding_metadata || undefined,
         });
 
         // Track successful installations
@@ -701,7 +757,7 @@ function App() {
               try {
                 const searchResult = await withTimeout(
                   invoke<SearchResult>("search_information", {
-                    query: `how to run ${recentlyInstalled.name} after installing on macOS`,
+                    query: `how to run ${recentlyInstalled.name} after installing on ${osInfo?.os_name || "your system"}`,
                   }),
                   30000,
                   "Search request timed out."
@@ -759,6 +815,7 @@ function App() {
       setStreamingMessageId(null);
       setStreamingOutput("");
       setIsExecuting(false);
+      setProgressMessage(null);
       addMessage({
         type: "ai",
         content: "Command stopped by user.",
@@ -1194,6 +1251,30 @@ function App() {
                             </div>
                           </div>
                         )}
+                        {message.groundingMetadata && message.groundingMetadata.groundingChunks && message.groundingMetadata.groundingChunks.length > 0 && (
+                          <div className="search-results">
+                            <div className="search-sources">
+                              <p className="sources-title">Sources (via Google Search):</p>
+                              <div className="sources-list">
+                                {message.groundingMetadata.groundingChunks.map((chunk, idx) => (
+                                  chunk.web && (
+                                    <a
+                                      key={idx}
+                                      href={chunk.web.uri}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="source-link"
+                                    >
+                                      <span className="source-number">{idx + 1}</span>
+                                      <span className="source-title">{chunk.web.title || chunk.web.uri}</span>
+                                      <span className="external-icon">↗</span>
+                                    </a>
+                                  )
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         {message.searchResult && (
                           <div className="search-results">
                             {message.searchResult.sources && message.searchResult.sources.length > 0 && (
@@ -1238,14 +1319,25 @@ function App() {
                               </p>
                             </div>
                             {message.suggestedFix && (
-                              <div className="warning-actions" style={{ display: "flex", gap: "0.75rem", marginLeft: "2rem", marginTop: "0.75rem" }}>
-                                <button
-                                  className="translate-btn"
-                                  onClick={() => handleApplyFix(message.suggestedFix!)}
-                                  style={{ minWidth: "auto", background: "var(--primary-color)", color: "var(--deep-charcoal)" }}
-                                >
-                                  ✓ Run Fix
-                                </button>
+                              <>
+                                <div style={{ marginLeft: "2rem", marginTop: "0.75rem", marginBottom: "0.5rem" }}>
+                                  <p style={{ fontSize: "0.85rem", color: "var(--primary-color)", marginBottom: "0.25rem", fontWeight: "500" }}>
+                                    Suggested fix:
+                                  </p>
+                                  <div className="code-block" style={{ marginTop: "0.25rem" }}>
+                                    <p>
+                                      <span className="prompt">aura</span>$ {message.suggestedFix}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="warning-actions" style={{ display: "flex", gap: "0.75rem", marginLeft: "2rem", marginTop: "0.75rem" }}>
+                                  <button
+                                    className="translate-btn"
+                                    onClick={() => handleApplyFix(message.suggestedFix!)}
+                                    style={{ minWidth: "auto", background: "var(--primary-color)", color: "var(--deep-charcoal)" }}
+                                  >
+                                    ✓ Run Fix
+                                  </button>
                                 <button
                                   className="translate-btn"
                                   onClick={() => {}}
@@ -1259,6 +1351,7 @@ function App() {
                                   ✗ Ignore
                                 </button>
                               </div>
+                              </>
                             )}
                           </div>
                         )}
@@ -1287,7 +1380,7 @@ function App() {
                   </div>
                   <div className="message-bubble">
                     <p className="message-text loading-message">
-                      <span className="terminal-cursor">▊</span> {executingCommand ? `Executing command...` : "Processing..."}
+                      <span className="terminal-cursor">▊</span> {progressMessage || (executingCommand ? `Executing command...` : "Processing...")}
                     </p>
                   </div>
                 </div>
