@@ -42,8 +42,7 @@
     ],
     "macOS": {
       "signingIdentity": null,
-      "entitlements": null,
-      "provisioningProfile": null
+      "entitlements": null
     }
   }
 }
