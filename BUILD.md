@@ -158,12 +158,14 @@ jobs:
 ## Troubleshooting
 
 ### macOS: "App is damaged and can't be opened"
-This occurs with unsigned apps. Users need to:
-1. Right-click the app
-2. Select "Open"
-3. Confirm opening the app
+**Note**: As of the latest releases, AuraShell is properly code-signed and notarized. Users should be able to install directly without security warnings.
 
-For distribution, consider code signing and notarization.
+If you still encounter this issue:
+1. Ensure you downloaded from the official GitHub releases
+2. Check that the file wasn't corrupted during download
+3. Try re-downloading the DMG file
+
+**For Maintainers**: Code signing is configured in the CI/CD pipeline. See the "Code Signing Configuration" section below for setup details.
 
 ### Linux: Permission denied for .AppImage
 ```bash
@@ -191,3 +193,61 @@ Approximate sizes:
 - macOS DMG: ~5-10 MB
 - Linux AppImage: ~15-20 MB
 - Linux .deb: ~5-10 MB
+
+## Code Signing Configuration (Maintainers)
+
+### macOS Code Signing and Notarization
+
+AuraShell releases are automatically code-signed and notarized during the GitHub Actions build process.
+
+#### Required GitHub Secrets
+
+The following secrets must be configured in the repository settings:
+
+- `APPLE_CERTIFICATE` - Base64-encoded .p12 Developer ID Application certificate
+- `APPLE_CERTIFICATE_PASSWORD` - Password for the .p12 certificate
+- `APPLE_ID` - Apple ID email address
+- `APPLE_PASSWORD` - App-specific password for notarization
+- `APPLE_TEAM_ID` - Apple Developer Team ID
+- `KEYCHAIN_PASSWORD` - Random password for temporary CI keychain
+
+#### Setting Up Code Signing
+
+1. **Generate Developer ID Certificate**:
+   - Enroll in Apple Developer Program ($99/year)
+   - Create a Developer ID Application certificate at developer.apple.com
+   - Export as .p12 file from Keychain Access
+   - Convert to base64: `base64 -i certificate.p12 | pbcopy`
+
+2. **Create App-Specific Password**:
+   - Go to appleid.apple.com → Sign In
+   - Generate app-specific password for "AuraShell Notarization"
+
+3. **Configure GitHub Secrets**:
+   - Add all required secrets to repository settings
+   - Secrets are automatically used by the release workflow
+
+#### Configuration Files
+
+- **Tauri Config**: `src-tauri/tauri.conf.json` - Contains macOS bundle settings
+- **CI Workflow**: `.github/workflows/release.yml` - Passes secrets to tauri-action
+
+The `tauri-apps/tauri-action` automatically handles:
+- Certificate import to keychain
+- Code signing during build
+- Notarization submission to Apple
+- Stapling notarization ticket to DMG
+
+#### Verifying Code Signature
+
+To verify a signed DMG locally:
+```bash
+# Check code signature
+codesign -dv --verbose=4 /path/to/AuraShell.app
+
+# Check notarization
+spctl -a -vv -t install /path/to/AuraShell.app
+
+# Check DMG signature
+codesign -dv /path/to/AuraShell.dmg
+```
