@@ -1524,17 +1524,17 @@ function setupDownloadButtons() {
 
     if (detected.os === 'macos') {
         if (detected.arch === 'aarch64') {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.0/AuraShell_0.1.0_aarch64.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_aarch64_darwin.dmg';
             buttonText = 'Download for macOS (Apple Silicon)';
         } else {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.0/AuraShell_0.1.0_x64.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_x64_darwin.dmg';
             buttonText = 'Download for macOS (Intel)';
         }
     } else if (detected.os === 'linux') {
-        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.0/AuraShell_0.1.0_amd64.deb';
+        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_amd64_linux.deb';
         buttonText = 'Download for Linux';
     } else if (detected.os === 'windows') {
-        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.0/AuraShell_0.1.0_x64-setup.exe';
+        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_x64-setup_windows.exe';
         buttonText = 'Download for Windows';
     }
 
