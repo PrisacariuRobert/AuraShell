@@ -2324,98 +2324,6 @@ body {
 .footer-links a:hover {
     color: var(--color-text-primary);
 }
-
-/* ============================================
-   Dark Mode
-   ============================================ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-text-primary: #f5f5f7;
-        --color-text-secondary: #8e8e93;
-        --color-background: #000000;
-        --color-surface: #1c1c1e;
-        --color-accent: #0a84ff;
-        --color-accent-hover: #3593ff;
-        --color-border: #3a3a3c;
-    }
-
-    .nav {
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: saturate(180%) blur(20px);
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .hero {
-        background: linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
-    }
-
-    .hero-title {
-        background: linear-gradient(135deg, #f5f5f7 0%, #8e8e93 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .comparison-old,
-    .comparison-new {
-        background: var(--color-surface);
-    }
-
-    .translation-section {
-        background: linear-gradient(180deg, #000000 0%, #1c1c1e 100%);
-    }
-
-    .translation-card {
-        background: var(--color-surface);
-        box-shadow: none;
-    }
-
-    .safety-section {
-        background: var(--color-background);
-    }
-
-    .danger-level {
-        background: var(--color-surface);
-    }
-
-    .features-section {
-        background: linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
-    }
-
-    .feature-card {
-        background: var(--color-surface);
-    }
-
-    .showcase-card {
-        background: var(--color-surface);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-    
-    .showcase-card-content {
-        background: var(--color-surface);
-    }
-
-    .final-cta {
-        background: var(--color-surface);
-    }
-
-    .footer {
-        background: var(--color-surface);
-        border-top: 1px solid var(--color-border);
-    }
-
-    .download-card {
-        background: rgba(28, 28, 30, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .download-card:hover {
-        background: var(--color-surface);
-        border-color: rgba(10, 132, 255, 0.3);
-    }
-}
-
 /* ============================================
    Download Section Styles
    ============================================ */
@@ -2851,6 +2759,104 @@ body {
     .install-command {
         font-size: 0.8rem;
         padding: 1rem;
+    }
+}
+
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text-primary: #f5f5f7;
+        --color-text-secondary: #8e8e93;
+        --color-background: #000000;
+        --color-surface: #1c1c1e;
+        --color-accent: #0a84ff;
+        --color-accent-hover: #3593ff;
+        --color-border: #3a3a3c;
+    }
+
+    .nav {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .hero {
+        background: linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
+    }
+    .natural-input{
+        background: #1d1d1f;
+        border: 1px solid #3a3a3c;
+
+    }
+   
+
+    .hero-title {
+        background: linear-gradient(135deg, #f5f5f7 0%, #8e8e93 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .comparison-old,
+    .comparison-new {
+        background: var(--color-surface);
+    }
+
+    .translation-section {
+        background: linear-gradient(180deg, #000000 0%, #1c1c1e 100%);
+    }
+
+    .translation-card {
+        background: var(--color-surface);
+        box-shadow: none;
+    }
+
+    .safety-section {
+        background: var(--color-background);
+    }
+
+    .danger-level {
+        background: var(--color-surface);
+    }
+
+    .features-section {
+        background: linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
+    }
+
+    .feature-card {
+        background: var(--color-surface);
+    }
+
+    .showcase-card {
+        background: var(--color-surface);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .showcase-card-content {
+        background: var(--color-surface);
+    }
+
+    .final-cta {
+        background: var(--color-surface);
+    }
+
+    .footer {
+        background: var(--color-surface);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .download-card {
+        background: rgba(36, 38, 43, 0.874);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .download-card:hover {
+        background: var(--color-surface);
+        border-color: rgba(10, 132, 255, 0.3);
     }
 }
 
