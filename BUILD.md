@@ -158,14 +158,30 @@ jobs:
 ## Troubleshooting
 
 ### macOS: "App is damaged and can't be opened"
-**Note**: As of the latest releases, AuraShell is properly code-signed and notarized. Users should be able to install directly without security warnings.
 
-If you still encounter this issue:
-1. Ensure you downloaded from the official GitHub releases
-2. Check that the file wasn't corrupted during download
-3. Try re-downloading the DMG file
+This is expected behavior because AuraShell is not code-signed. We've chosen to keep the project completely free rather than pay Apple's $99/year Developer Program fee.
 
-**For Maintainers**: Code signing is configured in the CI/CD pipeline. See the "Code Signing Configuration" section below for setup details.
+**For Users - Solutions:**
+
+**Solution 1: Right-click method (Recommended)**
+1. Go to Applications folder
+2. Right-click (or Control+click) on AuraShell.app
+3. Select "Open" from the menu
+4. Click "Open" in the security dialog
+5. This only needs to be done once
+
+**Solution 2: Remove quarantine attribute**
+```bash
+xattr -cr /Applications/AuraShell.app
+```
+
+**Solution 3: Use the installation script**
+```bash
+curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash
+```
+The script automatically handles quarantine removal.
+
+**For more installation options**, see [README.md](README.md) or [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 ### Linux: Permission denied for .AppImage
 ```bash
@@ -194,60 +210,48 @@ Approximate sizes:
 - Linux AppImage: ~15-20 MB
 - Linux .deb: ~5-10 MB
 
-## Code Signing Configuration (Maintainers)
+## Distribution Methods
 
-### macOS Code Signing and Notarization
+AuraShell uses a multi-tier FREE distribution strategy:
 
-AuraShell releases are automatically code-signed and notarized during the GitHub Actions build process.
+### 1. Automated Installation Script (Recommended for most users)
 
-#### Required GitHub Secrets
+Users can install with a single command:
 
-The following secrets must be configured in the repository settings:
-
-- `APPLE_CERTIFICATE` - Base64-encoded .p12 Developer ID Application certificate
-- `APPLE_CERTIFICATE_PASSWORD` - Password for the .p12 certificate
-- `APPLE_ID` - Apple ID email address
-- `APPLE_PASSWORD` - App-specific password for notarization
-- `APPLE_TEAM_ID` - Apple Developer Team ID
-- `KEYCHAIN_PASSWORD` - Random password for temporary CI keychain
-
-#### Setting Up Code Signing
-
-1. **Generate Developer ID Certificate**:
-   - Enroll in Apple Developer Program ($99/year)
-   - Create a Developer ID Application certificate at developer.apple.com
-   - Export as .p12 file from Keychain Access
-   - Convert to base64: `base64 -i certificate.p12 | pbcopy`
-
-2. **Create App-Specific Password**:
-   - Go to appleid.apple.com → Sign In
-   - Generate app-specific password for "AuraShell Notarization"
-
-3. **Configure GitHub Secrets**:
-   - Add all required secrets to repository settings
-   - Secrets are automatically used by the release workflow
-
-#### Configuration Files
-
-- **Tauri Config**: `src-tauri/tauri.conf.json` - Contains macOS bundle settings
-- **CI Workflow**: `.github/workflows/release.yml` - Passes secrets to tauri-action
-
-The `tauri-apps/tauri-action` automatically handles:
-- Certificate import to keychain
-- Code signing during build
-- Notarization submission to Apple
-- Stapling notarization ticket to DMG
-
-#### Verifying Code Signature
-
-To verify a signed DMG locally:
 ```bash
-# Check code signature
-codesign -dv --verbose=4 /path/to/AuraShell.app
-
-# Check notarization
-spctl -a -vv -t install /path/to/AuraShell.app
-
-# Check DMG signature
-codesign -dv /path/to/AuraShell.dmg
+curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash
 ```
+
+The script automatically:
+- Detects architecture
+- Downloads the correct DMG
+- Removes quarantine attributes
+- Installs to Applications
+
+### 2. Homebrew (For Homebrew users)
+
+Create a custom Homebrew tap (see Homebrew repository setup below).
+
+Users install with:
+```bash
+brew tap PrisacariuRobert/aurashell
+brew install --cask aurashell
+```
+
+### 3. Manual DMG Installation
+
+Users can download DMG files from GitHub Releases and follow the instructions in README.md or docs/INSTALLATION.md.
+
+### Why No Code Signing?
+
+AuraShell is completely free and open-source. Apple's Developer Program costs $99/year for code signing and notarization. To keep the project sustainable and accessible to everyone, we've chosen free distribution methods that work around this requirement.
+
+Users can:
+- Use the automated installation script
+- Use Homebrew for easy installation
+- Verify source code and build from source themselves
+- Use the right-click → Open method for manual installations
+
+For detailed installation instructions for end users, see:
+- [README.md](README.md) - Quick start guide
+- [docs/INSTALLATION.md](docs/INSTALLATION.md) - Comprehensive installation guide
