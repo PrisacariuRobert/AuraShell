@@ -1516,6 +1516,8 @@ function setupDownloadButtons() {
     const primaryBtn = document.getElementById('primary-download-btn');
     const primaryText = document.getElementById('primary-download-text');
     const heroBtn = document.getElementById('hero-download-btn');
+    const macosInstallMethods = document.getElementById('install-methods-macos');
+    const macosNotice = document.getElementById('macos-notice');
 
     if (!primaryBtn || !primaryText) return;
 
@@ -1523,19 +1525,29 @@ function setupDownloadButtons() {
     let buttonText = '';
 
     if (detected.os === 'macos') {
+        // Show macOS installation methods and notice
+        if (macosInstallMethods) macosInstallMethods.style.display = 'block';
+        if (macosNotice) macosNotice.style.display = 'block';
+
         if (detected.arch === 'aarch64') {
             downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_aarch64_darwin.dmg';
-            buttonText = 'Download for macOS (Apple Silicon)';
+            buttonText = 'Download DMG (Apple Silicon)';
         } else {
             downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_x64_darwin.dmg';
-            buttonText = 'Download for macOS (Intel)';
+            buttonText = 'Download DMG (Intel)';
         }
-    } else if (detected.os === 'linux') {
-        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_amd64_linux.deb';
-        buttonText = 'Download for Linux';
-    } else if (detected.os === 'windows') {
-        downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_x64-setup_windows.exe';
-        buttonText = 'Download for Windows';
+    } else {
+        // Hide macOS-specific elements for other OS
+        if (macosInstallMethods) macosInstallMethods.style.display = 'none';
+        if (macosNotice) macosNotice.style.display = 'none';
+
+        if (detected.os === 'linux') {
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_amd64_linux.deb';
+            buttonText = 'Download for Linux';
+        } else if (detected.os === 'windows') {
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.1/AuraShell_0.1.0_x64-setup_windows.exe';
+            buttonText = 'Download for Windows';
+        }
     }
 
     primaryText.textContent = buttonText;
