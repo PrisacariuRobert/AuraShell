@@ -12,12 +12,12 @@ Choose one of the following installation methods:
 
 **For Apple Silicon (M1/M2/M3):**
 ```bash
-cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64.dmg && xattr -cr AuraShell_0.1.0_aarch64.dmg && hdiutil attach AuraShell_0.1.0_aarch64.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && xattr -cr /Applications/AuraShell.app && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
+cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64_signed.dmg && hdiutil attach AuraShell_0.1.0_aarch64_signed.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
 ```
 
 **For Intel:**
 ```bash
-cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64.dmg && xattr -cr AuraShell_0.1.0_x64.dmg && hdiutil attach AuraShell_0.1.0_x64.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && xattr -cr /Applications/AuraShell.app && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
+cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64_signed.dmg && hdiutil attach AuraShell_0.1.0_x64_signed.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
 ```
 
 #### Option 2: Automated Install Script
@@ -44,14 +44,14 @@ brew install --cask aurashell
 #### Option 3: Manual Installation
 
 1. Download the latest DMG file for your architecture:
-   - **Apple Silicon (M1/M2/M3)**: [AuraShell_0.1.0_aarch64.dmg](https://github.com/PrisacariuRobert/AuraShell/releases/latest/download/AuraShell_0.1.0_aarch64.dmg)
-   - **Intel**: [AuraShell_0.1.0_x64.dmg](https://github.com/PrisacariuRobert/AuraShell/releases/latest/download/AuraShell_0.1.0_x64.dmg)
+   - **Apple Silicon (M1/M2/M3)**: [AuraShell_0.1.0_aarch64_signed.dmg](https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64_signed.dmg)
+   - **Intel**: [AuraShell_0.1.0_x64_signed.dmg](https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64_signed.dmg)
 
 2. Open the DMG file
 
 3. Drag AuraShell.app to your Applications folder
 
-4. **First launch only**: Right-click (or Control-click) on AuraShell.app and select "Open", then click "Open" again in the security dialog
+4. Double-click to launch - **No security warnings!** (Signed & Notarized by Apple)
 
 ### Linux
 

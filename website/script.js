@@ -1530,10 +1530,10 @@ function setupDownloadButtons() {
         if (macosNotice) macosNotice.style.display = 'block';
 
         if (detected.arch === 'aarch64') {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64_signed.dmg';
             buttonText = 'Download DMG (Apple Silicon)';
         } else {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64_signed.dmg';
             buttonText = 'Download DMG (Intel)';
         }
     } else {
