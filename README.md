@@ -8,9 +8,19 @@ An AI-Powered Terminal built with Tauri, React, and TypeScript.
 
 Choose one of the following installation methods:
 
-#### Option 1: Automated Install Script (Recommended)
+#### Option 1: One-Command Install (Fastest)
 
-The easiest way to install AuraShell is using our installation script:
+**For Apple Silicon (M1/M2/M3):**
+```bash
+cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_aarch64.dmg && xattr -cr AuraShell_0.1.0_aarch64.dmg && hdiutil attach AuraShell_0.1.0_aarch64.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && xattr -cr /Applications/AuraShell.app && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
+```
+
+**For Intel:**
+```bash
+cd /tmp && curl -L -O https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.3/AuraShell_0.1.0_x64.dmg && xattr -cr AuraShell_0.1.0_x64.dmg && hdiutil attach AuraShell_0.1.0_x64.dmg && cp -R /Volumes/AuraShell/AuraShell.app /Applications/ && xattr -cr /Applications/AuraShell.app && hdiutil detach /Volumes/AuraShell && echo "✅ Installed! Run: open -a AuraShell"
+```
+
+#### Option 2: Automated Install Script
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash
