@@ -1530,10 +1530,10 @@ function setupDownloadButtons() {
         if (macosNotice) macosNotice.style.display = 'block';
 
         if (detected.arch === 'aarch64') {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_aarch64_darwin.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_aarch64.dmg';
             buttonText = 'Download DMG (Apple Silicon)';
         } else {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_x64_darwin.dmg';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_x64.dmg';
             buttonText = 'Download DMG (Intel)';
         }
     } else {
@@ -1542,10 +1542,10 @@ function setupDownloadButtons() {
         if (macosNotice) macosNotice.style.display = 'none';
 
         if (detected.os === 'linux') {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_amd64_linux.deb';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_amd64.deb';
             buttonText = 'Download for Linux';
         } else if (detected.os === 'windows') {
-            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_x64-setup_windows.exe';
+            downloadUrl = 'https://github.com/PrisacariuRobert/AuraShell/releases/download/v0.1.2/AuraShell_0.1.0_x64-setup.exe';
             buttonText = 'Download for Windows';
         }
     }

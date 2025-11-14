@@ -9,17 +9,18 @@ echo ""
 
 # Detect architecture
 ARCH=$(uname -m)
-VERSION="0.1.0"
+RELEASE_TAG="0.1.2"
+FILE_VERSION="0.1.0"
 
 if [ "$ARCH" = "arm64" ]; then
     echo "✓ Detected Apple Silicon (ARM64)"
-    DMG_NAME="AuraShell_${VERSION}_aarch64.dmg"
+    DMG_NAME="AuraShell_${FILE_VERSION}_aarch64.dmg"
 else
     echo "✓ Detected Intel (x86_64)"
-    DMG_NAME="AuraShell_${VERSION}_x64.dmg"
+    DMG_NAME="AuraShell_${FILE_VERSION}_x64.dmg"
 fi
 
-DMG_URL="https://github.com/PrisacariuRobert/AuraShell/releases/download/v${VERSION}/${DMG_NAME}"
+DMG_URL="https://github.com/PrisacariuRobert/AuraShell/releases/download/v${RELEASE_TAG}/${DMG_NAME}"
 
 # Download DMG
 echo ""
