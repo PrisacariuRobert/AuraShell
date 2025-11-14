@@ -9,7 +9,7 @@ echo ""
 
 # Detect architecture
 ARCH=$(uname -m)
-RELEASE_TAG="0.1.2"
+RELEASE_TAG="0.1.3"
 FILE_VERSION="0.1.0"
 
 if [ "$ARCH" = "arm64" ]; then
