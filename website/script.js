@@ -1585,3 +1585,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ============================================
+// Copy Install Commands
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    const installCommands = document.querySelectorAll('.install-command');
+    
+    installCommands.forEach(commandBlock => {
+        commandBlock.addEventListener('click', async () => {
+            const text = commandBlock.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                // Visual feedback
+                const originalAfter = window.getComputedStyle(commandBlock, '::after').content;
+                const originalBg = commandBlock.style.background;
+                
+                // Show "Copied!" feedback
+                commandBlock.setAttribute('data-copied', 'true');
+                commandBlock.style.setProperty('--copy-text', '"Copied!"');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    commandBlock.removeAttribute('data-copied');
+                    commandBlock.style.removeProperty('--copy-text');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        });
+    });
+});

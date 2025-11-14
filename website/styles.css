@@ -2661,57 +2661,112 @@ body {
 }
 
 .install-option {
-    background: var(--color-surface);
+    background: var(--color-background);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 0;
     border: 1px solid var(--color-border);
     transition: var(--transition-smooth);
+    overflow: hidden;
 }
 
 .install-option:hover {
     border-color: var(--color-accent);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-small);
 }
 
 .install-option-label {
-    margin: 0 0 1rem 0;
+    margin: 0;
+    padding: 1rem 1.25rem;
     color: var(--color-text-primary);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .install-option-badge {
     background: var(--color-accent);
     color: white;
-    font-size: 0.7rem;
-    padding: 0.15rem 0.5rem;
-    border-radius: 12px;
-    font-weight: 500;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .install-command-wrapper {
     position: relative;
+    padding: 1.25rem;
 }
 
 .install-command {
     background: #1d1d1f;
-    border-radius: 12px;
-    padding: 1.25rem;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
     font-family: var(--font-mono);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: #00F5D4;
     overflow-x: auto;
-    line-height: 1.6;
-    border: 2px solid transparent;
+    overflow-y: hidden;
+    white-space: nowrap;
+    line-height: 1.5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition-fast);
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .install-command:hover {
     border-color: rgba(0, 245, 212, 0.3);
+    background: #252530;
+}
+
+.install-command::after {
+    content: var(--copy-text, 'Click to copy');
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: var(--font-display);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+.install-command:hover::after {
+    opacity: 1;
+}
+
+.install-command[data-copied="true"]::after {
+    content: var(--copy-text, 'Copied!');
+    color: var(--aura-electric-teal);
+    opacity: 1 !important;
+}
+
+/* Scrollbar styling for code blocks */
+.install-command::-webkit-scrollbar {
+    height: 6px;
+}
+
+.install-command::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.install-command::-webkit-scrollbar-thumb {
+    background: rgba(0, 245, 212, 0.3);
+    border-radius: 3px;
+}
+
+.install-command::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 245, 212, 0.5);
 }
 
 .install-divider {
