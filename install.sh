@@ -1,6 +1,7 @@
 #!/bin/bash
 # AuraShell Installation Script
 # This script downloads and installs AuraShell on macOS
+# Version: 0.1.3
 
 set -e
 
