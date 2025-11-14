@@ -316,24 +316,24 @@
 
             <!-- Installation Methods for macOS -->
             <div class="install-methods" id="install-methods-macos" style="display: none;">
-                <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    <h3 style="margin: 0 0 1rem 0; color: #fff; font-size: 1.25rem;">Easy Installation for macOS</h3>
+                <div class="install-methods-card">
+                    <h3 class="install-methods-title">Easy Installation for macOS</h3>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <p style="margin: 0 0 0.5rem 0; color: #a0a0a0; font-size: 0.9rem;">Option 1: One-line install (Recommended)</p>
-                        <div style="background: #1a1a1a; border-radius: 8px; padding: 1rem; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.85rem; color: #6366f1; overflow-x: auto;">
+                    <div class="install-option">
+                        <p class="install-option-label">Option 1: One-line install (Recommended)</p>
+                        <div class="install-command">
                             curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 1.5rem;">
-                        <p style="margin: 0 0 0.5rem 0; color: #a0a0a0; font-size: 0.9rem;">Option 2: Homebrew</p>
-                        <div style="background: #1a1a1a; border-radius: 8px; padding: 1rem; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.85rem; color: #6366f1; overflow-x: auto;">
+                    <div class="install-option">
+                        <p class="install-option-label">Option 2: Homebrew</p>
+                        <div class="install-command">
                             brew tap PrisacariuRobert/aurashell && brew install --cask aurashell
                         </div>
                     </div>
 
-                    <p style="margin: 1rem 0 0 0; color: #888; font-size: 0.85rem;">
+                    <p class="install-note">
                         Or download the DMG manually below
                     </p>
                 </div>
@@ -352,10 +352,10 @@
             </div>
 
             <!-- macOS Gatekeeper Notice -->
-            <div id="macos-notice" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; max-width: 600px; margin-left: auto; margin-right: auto;">
-                <p style="margin: 0; color: #f59e0b; font-size: 0.9rem;">
+            <div id="macos-notice" class="macos-notice" style="display: none;">
+                <p>
                     <strong>First time opening?</strong> Right-click the app and select "Open" to bypass macOS security warnings.
-                    <a href="https://github.com/PrisacariuRobert/AuraShell/blob/main/README.md#troubleshooting" style="color: #fbbf24; text-decoration: underline;">Learn more</a>
+                    <a href="https://github.com/PrisacariuRobert/AuraShell/blob/main/README.md#troubleshooting">Learn more</a>
                 </p>
             </div>
 
