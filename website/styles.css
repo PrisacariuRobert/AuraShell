@@ -2629,95 +2629,173 @@ body {
 }
 
 .install-methods-card {
-    background: var(--color-surface);
+    background: var(--color-background);
     border: 1px solid var(--color-border);
-    border-radius: 16px;
-    padding: 2rem;
-    max-width: 600px;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 800px;
     margin: 0 auto 2rem auto;
-    box-shadow: var(--shadow-small);
-    transition: var(--transition-smooth);
-}
-
-.install-methods-card:hover {
     box-shadow: var(--shadow-medium);
 }
 
 .install-methods-title {
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 0.5rem 0;
     color: var(--color-text-primary);
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
+    text-align: center;
+}
+
+.install-methods-subtitle {
+    margin: 0 0 2.5rem 0;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    text-align: center;
+}
+
+.install-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .install-option {
-    margin-bottom: 1.5rem;
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    transition: var(--transition-smooth);
 }
 
-.install-option:last-child {
-    margin-bottom: 0;
+.install-option:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-small);
 }
 
 .install-option-label {
-    margin: 0 0 0.5rem 0;
-    color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    margin: 0 0 1rem 0;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.install-option-badge {
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
     font-weight: 500;
+}
+
+.install-command-wrapper {
+    position: relative;
 }
 
 .install-command {
     background: #1d1d1f;
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 1.25rem;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--color-accent);
+    font-size: 0.9rem;
+    color: #00F5D4;
     overflow-x: auto;
-    white-space: nowrap;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    line-height: 1.6;
+    border: 2px solid transparent;
     transition: var(--transition-fast);
 }
 
 .install-command:hover {
-    border-color: var(--color-accent);
+    border-color: rgba(0, 245, 212, 0.3);
 }
 
-.install-note {
-    margin: 1rem 0 0 0;
-    color: var(--color-text-secondary);
-    font-size: 0.85rem;
+.install-divider {
     text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.install-divider::before,
+.install-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: var(--color-border);
+}
+
+.install-divider::before {
+    left: 0;
+}
+
+.install-divider::after {
+    right: 0;
 }
 
 .macos-notice {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(255, 149, 0, 0.08);
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-surface);
     border: 1px solid rgba(255, 149, 0, 0.2);
-    border-radius: 12px;
-    max-width: 600px;
+    border-radius: 16px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.macos-notice-icon {
+    flex-shrink: 0;
+    color: var(--color-warning);
+    margin-top: 0.1rem;
 }
 
 .macos-notice p {
     margin: 0;
-    color: var(--color-warning);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 .macos-notice strong {
     font-weight: 600;
+    color: var(--color-text-primary);
 }
 
 .macos-notice a {
-    color: var(--color-warning);
-    text-decoration: underline;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
     transition: var(--transition-fast);
 }
 
 .macos-notice a:hover {
-    opacity: 0.8;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .install-options-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .install-methods-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .install-command {
+        font-size: 0.8rem;
+        padding: 1rem;
+    }
 }
 

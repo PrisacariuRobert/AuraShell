@@ -317,25 +317,29 @@
             <!-- Installation Methods for macOS -->
             <div class="install-methods" id="install-methods-macos" style="display: none;">
                 <div class="install-methods-card">
-                    <h3 class="install-methods-title">Easy Installation for macOS</h3>
+                    <h3 class="install-methods-title">Choose Your Installation Method</h3>
+                    <p class="install-methods-subtitle">Select the easiest way to get AuraShell on your Mac</p>
 
-                    <div class="install-option">
-                        <p class="install-option-label">Option 1: One-line install (Recommended)</p>
-                        <div class="install-command">
-                            curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash
+                    <div class="install-options-grid">
+                        <div class="install-option">
+                            <p class="install-option-label">
+                                Automated Script
+                                <span class="install-option-badge">Recommended</span>
+                            </p>
+                            <div class="install-command-wrapper">
+                                <div class="install-command">curl -fsSL https://raw.githubusercontent.com/PrisacariuRobert/AuraShell/main/install.sh | bash</div>
+                            </div>
+                        </div>
+
+                        <div class="install-option">
+                            <p class="install-option-label">Homebrew</p>
+                            <div class="install-command-wrapper">
+                                <div class="install-command">brew tap PrisacariuRobert/aurashell && brew install --cask aurashell</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="install-option">
-                        <p class="install-option-label">Option 2: Homebrew</p>
-                        <div class="install-command">
-                            brew tap PrisacariuRobert/aurashell && brew install --cask aurashell
-                        </div>
-                    </div>
-
-                    <p class="install-note">
-                        Or download the DMG manually below
-                    </p>
+                    <div class="install-divider">or</div>
                 </div>
             </div>
 
@@ -353,9 +357,16 @@
 
             <!-- macOS Gatekeeper Notice -->
             <div id="macos-notice" class="macos-notice" style="display: none;">
+                <div class="macos-notice-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                        <path d="M12 9v4"/>
+                        <path d="M12 17h.01"/>
+                    </svg>
+                </div>
                 <p>
                     <strong>First time opening?</strong> Right-click the app and select "Open" to bypass macOS security warnings.
-                    <a href="https://github.com/PrisacariuRobert/AuraShell/blob/main/README.md#troubleshooting">Learn more</a>
+                    <a href="https://github.com/PrisacariuRobert/AuraShell/blob/main/README.md#troubleshooting">Learn more →</a>
                 </p>
             </div>
 
