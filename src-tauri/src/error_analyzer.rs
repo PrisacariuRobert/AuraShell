@@ -195,7 +195,7 @@ pub async fn generate_ai_fix(
     dotenvy::dotenv().ok();
 
     let api_key = std::env::var("GEMINI_API_KEY")
-        .unwrap_or_else(|_| "AIzaSyCnVi34Wd_fKoqW2m3TqJ9sSGVVdK_7F6w".to_string());
+        .map_err(|_| "GEMINI_API_KEY environment variable not set".to_string())?;
 
     let url = format!(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={}",

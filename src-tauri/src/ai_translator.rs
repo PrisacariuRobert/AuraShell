@@ -330,7 +330,7 @@ pub async fn translate_to_shell_command(
     dotenvy::dotenv().ok();
 
     let api_key = std::env::var("GEMINI_API_KEY")
-        .unwrap_or_else(|_| "AIzaSyCnVi34Wd_fKoqW2m3TqJ9sSGVVdK_7F6w".to_string());
+        .map_err(|_| "GEMINI_API_KEY environment variable not set".to_string())?;
 
     let model = if use_web_search {
         "gemini-2.5-flash"
